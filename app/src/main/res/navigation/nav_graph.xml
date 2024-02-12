@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/main_fragment">
+
+    <fragment
+        android:id="@+id/main_fragment"
+        android:name="com.example.pdp.presentation.fragments.MainFragment"
+        android:label="fragment_main"
+        tools:layout="@layout/fragment_main">
+        <action
+            android:id="@+id/action_mainFragment_to_mealsFragment"
+            app:destination="@id/meals_fragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_serviceFragment"
+            app:destination="@id/service_fragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/meals_fragment"
+        android:name="com.example.pdp.presentation.fragments.MealsFragment"
+        android:label="fragment_meals"
+        tools:layout="@layout/fragment_meals">
+        <action
+            android:id="@+id/action_meals_fragment_to_add_meal_fragment"
+            app:destination="@id/add_meal_fragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/add_meal_fragment"
+        android:name="com.example.pdp.presentation.fragments.AddMealFragment"
+        android:label="fragment_add_meal"
+        tools:layout="@layout/fragment_add_meal" />
+
+    <fragment
+        android:id="@+id/service_fragment"
+        android:name="com.example.pdp.presentation.fragments.ServiceFragment"
+        android:label="fragment_service"
+        tools:layout="@layout/fragment_service" />
+</navigation>
