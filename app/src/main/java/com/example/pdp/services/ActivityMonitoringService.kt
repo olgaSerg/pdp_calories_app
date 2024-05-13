@@ -17,7 +17,7 @@ class ActivityMonitoringService : Service(), SensorEventListener {
     private val binder = LocalBinder()
     private lateinit var sensorManager: SensorManager
     private var accelerometer: Sensor? = null
-    private var activityType = getString(R.string.unknown_activity)
+    private lateinit var activityType: String
 
     inner class LocalBinder : Binder() {
         fun getService(): ActivityMonitoringService = this@ActivityMonitoringService
@@ -25,6 +25,7 @@ class ActivityMonitoringService : Service(), SensorEventListener {
 
     override fun onCreate() {
         super.onCreate()
+        activityType = getString(R.string.unknown_activity)
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
