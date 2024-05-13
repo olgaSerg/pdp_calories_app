@@ -9,6 +9,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Binder
 import android.os.IBinder
+import com.example.pdp.R
 import kotlin.math.sqrt
 
 class ActivityMonitoringService : Service(), SensorEventListener {
@@ -16,7 +17,7 @@ class ActivityMonitoringService : Service(), SensorEventListener {
     private val binder = LocalBinder()
     private lateinit var sensorManager: SensorManager
     private var accelerometer: Sensor? = null
-    private var activityType = "Неопределено"
+    private var activityType = getString(R.string.unknown_activity)
 
     inner class LocalBinder : Binder() {
         fun getService(): ActivityMonitoringService = this@ActivityMonitoringService
@@ -57,9 +58,9 @@ class ActivityMonitoringService : Service(), SensorEventListener {
         val magnitude = sqrt((x * x + y * y + z * z).toDouble()) - gravity
 
         activityType = when {
-            magnitude < 2 -> "Покой"
-            magnitude < 5 -> "Ходьба"
-            else -> "Бег"
+            magnitude < 2 -> getString(R.string.rest)
+            magnitude < 5 -> getString(R.string.walk)
+            else -> getString(R.string.run)
         }
     }
 

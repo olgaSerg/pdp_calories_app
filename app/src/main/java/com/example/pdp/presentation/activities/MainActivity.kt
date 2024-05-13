@@ -11,13 +11,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.pdp.R
-import com.example.pdp.services.NetworkChangedReceiver
+import com.example.pdp.services.ChargingMonitoringReceiver
 import com.example.pdp.models.Contact
 
 private const val REQUEST_READ_CONTACTS = 10
+
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var networkChangedReceiver: NetworkChangedReceiver
+    private lateinit var receiver: ChargingMonitoringReceiver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,12 +29,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun registerReceiver() {
-        networkChangedReceiver = NetworkChangedReceiver()
+        receiver = ChargingMonitoringReceiver()
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_POWER_CONNECTED)
             addAction(Intent.ACTION_POWER_DISCONNECTED)
         }
-        registerReceiver(networkChangedReceiver, filter)
+        registerReceiver(receiver, filter)
     }
 
     private fun requestContactsPermission() {
@@ -101,7 +102,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        unregisterReceiver(networkChangedReceiver)
+        unregisterReceiver(receiver)
         super.onDestroy()
     }
 }

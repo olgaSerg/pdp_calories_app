@@ -15,12 +15,14 @@ import com.example.pdp.R
 import com.example.pdp.databinding.FragmentServiceBinding
 import com.example.pdp.services.ActivityMonitoringService
 
+private const val ACTIVITY = "Текущая активность:"
+
 class ServiceFragment : Fragment(R.layout.fragment_service) {
 
     private var _binding: FragmentServiceBinding? = null
     private val binding get() = _binding!!
-    private var mService: ActivityMonitoringService? = null
-    private var mBound: Boolean = false
+    private var monitoringService: ActivityMonitoringService? = null
+    private var isBound: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,12 +42,12 @@ class ServiceFragment : Fragment(R.layout.fragment_service) {
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             val binder = service as ActivityMonitoringService.LocalBinder
-            mService = binder.getService()
-            mBound = true
+            monitoringService = binder.getService()
+            isBound = true
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
-            mBound = false
+            isBound = false
         }
     }
 
@@ -58,16 +60,22 @@ class ServiceFragment : Fragment(R.layout.fragment_service) {
 
     override fun onStop() {
         super.onStop()
-        if (mBound) {
+        if (isBound) {
             activity?.unbindService(connection)
-            mBound = false
+            isBound = false
         }
     }
 
     private fun checkActivityType() {
-        if (mBound) {
-            val activityType = mService?.getActivityType()
-            Toast.makeText(context, "Текущая активность: $activityType", Toast.LENGTH_SHORT).show()
+        if (isBound) {
+            val activityType = monitoringService?.getActivityType()
+            Toast.makeText(context, "$ACTIVITY $activityType", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    override fun onDestroyView() {
+        _binding = null
+        monitoringService = null
+        super.onDestroyView()
     }
 }

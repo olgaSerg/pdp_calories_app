@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">MealApp</string>
+    <string name="save">Сохранить</string>
+    <string name="calories">Калории</string>
+    <string name="name">Название</string>
+    <string name="meal_database">meal_database</string>
+    <string name="unknown_activity">Неопределено</string>
+    <string name="rest">Покой</string>
+    <string name="walk">Ходьба</string>
+    <string name="run">Бег</string>
 </resources>

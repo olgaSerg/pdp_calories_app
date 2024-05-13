@@ -1,13 +1,13 @@
 package com.example.pdp.presentation.fragments
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TimePicker
+import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.example.pdp.R
+import com.example.pdp.databinding.FragmentAddMealBinding
 import com.example.pdp.db.AppDatabase
 import com.example.pdp.db.MealEntry
 import java.text.SimpleDateFormat
@@ -16,25 +16,28 @@ import java.util.Locale
 
 class AddMealFragment : Fragment(R.layout.fragment_add_meal) {
 
-    private var timePicker: TimePicker? = null
-    private var mealNameEditText: EditText? = null
-    private var caloriesEditText: EditText? = null
-    private var saveButton: Button? = null
+    private var _binding: FragmentAddMealBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentAddMealBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        timePicker = view.findViewById(R.id.time_picker)
-        mealNameEditText = view.findViewById(R.id.edit_text_meal_name)
-        caloriesEditText = view.findViewById(R.id.edit_text_calories)
-        saveButton = view.findViewById(R.id.button_save)
 
-        saveButton?.setOnClickListener {
+        binding.buttonSave.setOnClickListener {
             saveMeal()
         }
     }
+
     private fun saveMeal() {
-        val mealName = mealNameEditText?.text.toString()
-        val calories = caloriesEditText?.text.toString().toIntOrNull() ?: 0
+        val mealName = binding.editTextMealName.text.toString()
+        val calories = binding.editTextCalories.text.toString().toIntOrNull() ?: 0
         val date = Date()
         val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(date)
 

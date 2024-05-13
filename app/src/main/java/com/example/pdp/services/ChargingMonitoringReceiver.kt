@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 
-class NetworkChangedReceiver : BroadcastReceiver() {
+class ChargingMonitoringReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val isCharging: Boolean = intent.action == Intent.ACTION_POWER_CONNECTED
