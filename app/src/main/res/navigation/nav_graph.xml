@@ -15,6 +15,9 @@
         <action
             android:id="@+id/action_mainFragment_to_serviceFragment"
             app:destination="@id/service_fragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_contactsFragment"
+            app:destination="@id/contacts_fragment" />
     </fragment>
 
     <fragment
@@ -31,11 +34,27 @@
         android:id="@+id/add_meal_fragment"
         android:name="com.example.pdp.presentation.fragments.AddMealFragment"
         android:label="fragment_add_meal"
-        tools:layout="@layout/fragment_add_meal" />
+        tools:layout="@layout/fragment_add_meal">
+        <argument
+            android:name="mealId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/service_fragment"
         android:name="com.example.pdp.presentation.fragments.ServiceFragment"
         android:label="fragment_service"
-        tools:layout="@layout/fragment_service" />
+        tools:layout="@layout/fragment_service">
+        <argument
+            android:name="fragmentTag"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/contacts_fragment"
+        android:name="com.example.pdp.presentation.fragments.ContactsFragment"
+        android:label="fragment_service"
+        tools:layout="@layout/fragment_contacts" />
 </navigation>

@@ -1,49 +1,36 @@
 package com.example.pdp.presentation.fragments
 
+import android.Manifest
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import com.example.pdp.R
 import com.example.pdp.databinding.FragmentServiceBinding
+import com.example.pdp.presentation.base.BaseFragment
 import com.example.pdp.services.ActivityMonitoringService
 
-private const val ACTIVITY = "Текущая активность:"
+class ServiceFragment : BaseFragment<FragmentServiceBinding>(), ActivityMonitoringService.ActivityChangeCallback {
 
-class ServiceFragment : Fragment(R.layout.fragment_service) {
-
-    private var _binding: FragmentServiceBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private var monitoringService: ActivityMonitoringService? = null
     private var isBound: Boolean = false
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentServiceBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding.buttonCheckActivity.setOnClickListener {
-            checkActivityType()
-        }
-    }
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             val binder = service as ActivityMonitoringService.LocalBinder
             monitoringService = binder.getService()
             isBound = true
+            binder.setCallback(this@ServiceFragment)
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
@@ -51,31 +38,65 @@ class ServiceFragment : Fragment(R.layout.fragment_service) {
         }
     }
 
+    override fun inflateBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentServiceBinding {
+        return FragmentServiceBinding.inflate(inflater)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                bindAndStartService()
+            } else {
+                Toast.makeText(context, "Activity recognition permission is required for this app", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     override fun onStart() {
         super.onStart()
-        Intent(activity, ActivityMonitoringService::class.java).also { intent ->
-            activity?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
+        } else {
+            bindAndStartService()
         }
     }
 
     override fun onStop() {
         super.onStop()
         if (isBound) {
-            activity?.unbindService(connection)
+            requireActivity().unbindService(connection)
             isBound = false
         }
     }
 
-    private fun checkActivityType() {
-        if (isBound) {
-            val activityType = monitoringService?.getActivityType()
-            Toast.makeText(context, "$ACTIVITY $activityType", Toast.LENGTH_SHORT).show()
+    override fun onDestroyView() {
+        monitoringService = null
+        stopService()
+        super.onDestroyView()
+    }
+
+    override fun onActivityChanged(activityType: String) {
+        Toast.makeText(context, getString(R.string.current_activity, activityType), Toast.LENGTH_SHORT).show()
+    }
+
+    private fun bindAndStartService() {
+        Intent(requireActivity(), ActivityMonitoringService::class.java).also { intent ->
+            requireActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE)
+            requireActivity().startForegroundService(intent)
         }
     }
 
-    override fun onDestroyView() {
-        _binding = null
-        monitoringService = null
-        super.onDestroyView()
+    private fun stopService() {
+        Intent(requireActivity(), ActivityMonitoringService::class.java).also { intent ->
+            requireActivity().stopService(intent)
+        }
     }
 }

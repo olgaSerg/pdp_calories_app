@@ -1,85 +1,95 @@
 package com.example.pdp.presentation.fragments
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.paging.CombinedLoadStates
-import androidx.paging.LoadState
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.liveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.pdp.presentation.adapters.MealAdapter
-import com.example.pdp.app.MealApp
 import com.example.pdp.R
 import com.example.pdp.databinding.FragmentMealsBinding
+import com.example.pdp.db.AppDatabase
+import com.example.pdp.db.MealDao
+import com.example.pdp.db.MealEntry
+import com.example.pdp.presentation.base.BaseFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class MealsFragment : Fragment() {
+private const val MEAL_ID_KEY = "mealId"
 
-    private var _binding: FragmentMealsBinding? = null
-    private val binding get() = _binding!!
-    private lateinit var mealAdapter: MealAdapter
+class MealsFragment : BaseFragment<FragmentMealsBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentMealsBinding.inflate(inflater, container, false)
-        return binding.root
+    private var mealAdapter: MealAdapter? = null
+    private var mealDao: MealDao? = null
+
+    override fun inflateBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentMealsBinding {
+        return FragmentMealsBinding.inflate(inflater)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mealAdapter = MealAdapter()
+        mealDao = AppDatabase.getDatabase(requireContext()).mealDao()
+        setupRecyclerView()
+        setClickListener()
+        observeMeals()
+    }
+
+    private fun setupRecyclerView() {
+        mealAdapter = MealAdapter(
+            onDeleteClick = { meal ->
+                deleteMeal(meal)
+            },
+            onUpdateClick = { meal ->
+                navigateToUpdateMeal(meal)
+            }
+        )
         binding.rvMealEntries.adapter = mealAdapter
         binding.rvMealEntries.layoutManager = LinearLayoutManager(requireActivity())
+    }
 
-        setClickListener()
+    private fun observeMeals() {
+        mealDao?.let { dao ->
+            val pager = Pager(
+                config = PagingConfig(
+                    pageSize = 5,
+                    maxSize = 7,
+                    initialLoadSize = 7,
+                    prefetchDistance = 1
+                ),
+                pagingSourceFactory = { dao.allMealsPagingSource() }
+            ).liveData
 
-        val mealDao = MealApp.db?.mealDao() ?: return
-
-        val pager = Pager(
-            config = PagingConfig(
-                pageSize = 5,
-                maxSize = 7,
-                initialLoadSize = 7,
-                prefetchDistance = 1
-            ),
-            pagingSourceFactory = { mealDao.allMealsPagingSource() }
-        ).liveData
-
-        pager.observe(viewLifecycleOwner) {
-            mealAdapter.submitData(lifecycle, it)
-        }
-
-        mealAdapter.addLoadStateListener { loadState ->
-            handleLoadStates(loadState)
+            pager.observe(viewLifecycleOwner) {
+                mealAdapter?.submitData(lifecycle, it)
+            }
         }
     }
 
-    private fun handleLoadStates(loadState: CombinedLoadStates) {
-        if (loadState.refresh is LoadState.Loading) {
-            Log.d("PagingLog", "Initial load starts.")
-        }
 
-        if (loadState.append is LoadState.Loading) {
-            Log.d("PagingLog", "Loading next page.")
-        }
-
-        if (loadState.append is LoadState.NotLoading && loadState.append.endOfPaginationReached) {
-            Log.d("PagingLog", "End of data reached.")
-        }
-
-        if (loadState.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached) {
-            if (mealAdapter.itemCount < 1) {
-                Log.d("PagingLog", "No items to display.")
+    private fun deleteMeal(meal: MealEntry) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                mealDao?.delete(meal)
             }
+            mealAdapter?.refresh()
         }
+    }
+
+    private fun navigateToUpdateMeal(meal: MealEntry) {
+        val bundle = Bundle().apply {
+            putInt(MEAL_ID_KEY, meal.id)
+        }
+        findNavController().navigate(R.id.action_meals_fragment_to_add_meal_fragment, bundle)
     }
 
     private fun setClickListener() {
@@ -89,7 +99,7 @@ class MealsFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        _binding = null
+        mealAdapter = null
         super.onDestroyView()
     }
 }

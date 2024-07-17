@@ -1,17 +1,17 @@
 package com.example.pdp.db
 
 import androidx.room.TypeConverter
-import java.util.Date
+import java.time.LocalDate
 
 class Converters {
 
     @TypeConverter
-    fun fromDate(date: Date?): Long? {
-        return date?.time
+    fun fromLocalDate(date: LocalDate?): Long? {
+        return date?.toEpochDay()
     }
 
     @TypeConverter
-    fun toDate(millisSinceEpoch: Long?): Date? {
-        return millisSinceEpoch?.let { Date(it) }
+    fun toLocalDate(epochDay: Long?): LocalDate? {
+        return epochDay?.let { LocalDate.ofEpochDay(it) }
     }
 }

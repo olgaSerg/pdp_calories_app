@@ -8,20 +8,33 @@ import androidx.recyclerview.widget.DiffUtil
 import com.example.pdp.databinding.ItemMealBinding
 import com.example.pdp.db.MealEntry
 
-class MealAdapter : PagingDataAdapter<MealEntry, MealAdapter.MealViewHolder>(MEAL_COMPARATOR) {
+class MealAdapter(
+    private val onDeleteClick: (MealEntry) -> Unit,
+    private val onUpdateClick: (MealEntry) -> Unit
+) : PagingDataAdapter<MealEntry, MealAdapter.MealViewHolder>(MEAL_COMPARATOR) {
 
-    class MealViewHolder(private val binding: ItemMealBinding) : RecyclerView.ViewHolder(binding.root) {
+    class MealViewHolder(
+        private val binding: ItemMealBinding,
+        private val onDeleteClick: (MealEntry) -> Unit,
+        private val onUpdateClick: (MealEntry) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(meal: MealEntry) {
             binding.tvMealName.text = meal.mealName
             binding.tvMealTime.text = meal.time
             binding.tvMealCalories.text = meal.calories.toString()
+            binding.icDelete.setOnClickListener {
+                onDeleteClick(meal)
+            }
+            binding.icEdit.setOnClickListener {
+                onUpdateClick(meal)
+            }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MealViewHolder {
         val binding = ItemMealBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return MealViewHolder(binding)
+        return MealViewHolder(binding, onDeleteClick, onUpdateClick)
     }
 
     override fun onBindViewHolder(holder: MealViewHolder, position: Int) {

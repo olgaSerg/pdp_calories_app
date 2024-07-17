@@ -8,12 +8,13 @@ import android.widget.Toast
 class ChargingMonitoringReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        val isCharging: Boolean = intent.action == Intent.ACTION_POWER_CONNECTED
-
-        if (isCharging) {
-            Toast.makeText(context, "Device is charging", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(context, "Device is not charging", Toast.LENGTH_SHORT).show()
+        when (intent.action) {
+            Intent.ACTION_POWER_CONNECTED -> {
+                Toast.makeText(context, "Device is charging", Toast.LENGTH_SHORT).show()
+            }
+            Intent.ACTION_POWER_DISCONNECTED -> {
+                Toast.makeText(context, "Device is not charging", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

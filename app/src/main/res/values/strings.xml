@@ -8,4 +8,9 @@
     <string name="rest">Покой</string>
     <string name="walk">Ходьба</string>
     <string name="run">Бег</string>
+    <string name="current_activity">Текущая активность: %1$s</string>
+    <string name="activity_monitoring_service_title">Activity Monitoring Service</string>
+    <string name="activity_monitoring_service_subtitle">Monitoring activity in the background</string>
+    <string name="current_activity_content">Current activity: %1$s</string>
+    <string name="service_fragment_value">ServiceFragment</string>
 </resources>

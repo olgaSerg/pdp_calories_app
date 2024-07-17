@@ -1,27 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/linearLayout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="20dp">
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/tv_meal_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="12:00" />
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="9dp"
+        android:text="12:00"
+        app:layout_constraintBottom_toTopOf="@+id/tv_meal_name"
+        app:layout_constraintStart_toStartOf="@+id/tv_meal_name"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <TextView
         android:id="@+id/tv_meal_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Салат" />
+        android:layout_marginBottom="8dp"
+        android:text="Салат"
+        app:layout_constraintBottom_toTopOf="@+id/tv_meal_calories"
+        app:layout_constraintStart_toStartOf="@+id/tv_meal_calories"
+        app:layout_constraintTop_toBottomOf="@+id/tv_meal_time" />
 
     <TextView
         android:id="@+id/tv_meal_calories"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="250 ккал" />
-</LinearLayout>
+        android:layout_marginStart="40dp"
+        android:layout_marginLeft="40dp"
+        android:text="250 ккал"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_meal_name"/>
+
+    <ImageView
+        android:id="@+id/ic_edit"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_edit"
+        app:layout_constraintEnd_toStartOf="@+id/ic_delete"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="8dp" />
+
+    <ImageView
+        android:id="@+id/ic_delete"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_delete"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
